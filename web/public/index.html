@@ -12,10 +12,63 @@ var log = function (value) {
 }
 
 var vm = {
+  venues: m.prop([]),
   artist_profiles: m.prop([])
 }
 
-// venue profile stuff
+
+function VenueCtrl () {
+  var ctrl = {
+    searchForVenue: function searchForVenue (e) {
+      e.preventDefault();
+      m.request({
+        url: '/venues/search',
+        method: 'POST',
+        data: { venue: e.currentTarget.venue.value }
+      }).then(vm.venues)
+    },
+    getVenuePlaylist: function (venue, e) {
+      e.preventDefault();
+      m.request({
+        url: '/venues/' + venue.id,
+        method: 'GET'
+      }).then(vm.artist_profiles)
+    }
+  }
+  return ctrl
+}
+
+var venueSearchResult = function (ctrl, v) {
+  return [
+    m('.venue_search_result', [
+      m('div', [
+        m('a', {
+          onclick: ctrl.getVenuePlaylist.bind(null, v),
+          href: '#'
+        }, v.name)
+      ]),
+      m('a', {href: v.website}, 'Venue website'),
+      m('br'),
+      v.address
+    ]),
+    m('br')
+  ]
+}
+
+function venueSearchView (ctrl) {
+  var results = vm.venues().map(venueSearchResult.bind(null, ctrl));
+
+  return [
+    m('form', { onsubmit: ctrl.searchForVenue },  [  // revisit 12/17
+      m('input[name=venue]')
+    ]),
+    m('br'),
+    results
+  ]
+}
+
+/////
+PlaylistCtrl = function () {}
 
 var artistTrack = function (track) {
   return [m('a', {href: track.url}, track.name), m('br')]
@@ -33,70 +86,16 @@ var playlistItem = function (artist_profile) {
   ]
 }
 
-function venuePlaylistView () {
+function venuePlaylistView (ctrl) {
   var profiles = vm.artist_profiles().map(playlistItem);
 
   return profiles
 }
 
-
-function getVenuePlaylist (ctrl, venue, e) {
-  e.preventDefault();
-  m.request({
-    url: '/venues/' + venue.id,
-    method: 'GET'
-  }).then(vm.artist_profiles)
-}
+// <--
 
 
-// search & search result stuff
-
-function ctrl () {
-  var ctrl = {
-    venues: m.prop([])
-  }
-  return ctrl
-}
-
-var venueSearchResult = function (ctrl, v) {
-  return [
-    m('.venue_search_result', [
-      m('div', [
-        m('a', {
-          onclick: getVenuePlaylist.bind(null, ctrl, v),
-          href: '#'
-        }, v.name)
-      ]),
-      m('a', {href: v.website}, 'Venue website'),
-      m('br'),
-      v.address
-    ]),
-    m('br')
-  ]
-}
-
-function venueSearchView (ctrl) {
-  var results = ctrl.venues().map(venueSearchResult.bind(null, ctrl));
-
-  return [
-    m('form', { onsubmit: searchForVenue.bind(null, ctrl) },  [  // revisit 12/17
-      m('input[name=venue]')
-    ]),
-    m('br'),
-    results
-  ]
-}
-
-function searchForVenue (ctrl, e) {
-  e.preventDefault();
-  m.request({
-    url: '/venues/search',
-    method: 'POST',
-    data: { venue: e.currentTarget.venue.value }
-  }).then(ctrl.venues)
-}
-
-m.module(document.getElementById('venue_search'), { controller: ctrl, view: venueSearchView })
-m.module(document.getElementById('venue_playlist'), { controller: ctrl, view: venuePlaylistView })
+m.module(document.getElementById('venue_search'), { controller: VenueCtrl, view: venueSearchView })
+m.module(document.getElementById('venue_playlist'), { controller: PlaylistCtrl, view: venuePlaylistView })
 
 </script>
