@@ -1,0 +1,102 @@
+<!doctype html>
+<title>Title</title>
+<script src='/js/vendor/mithril.js'></script>
+
+<div id='venue_search'></div>
+<div id='venue_playlist'></div>
+
+<script>
+// console log function for logging results of ajax requests
+var log = function (value) {
+  console.log(value)
+}
+
+var vm = {
+  artist_profiles: m.prop([])
+}
+
+// venue profile stuff
+
+var artistTrack = function (track) {
+  return [m('a', {href: track.url}, track.name), m('br')]
+}
+
+var playlistItem = function (artist_profile) {
+  var tracks = artist_profile.tracks.map(artistTrack);
+
+  return [
+    m('.playlist_item', [
+      artist_profile.name,
+      m('br'),
+      tracks
+    ])
+  ]
+}
+
+function venuePlaylistView () {
+  var profiles = vm.artist_profiles().map(playlistItem);
+
+  return profiles
+}
+
+
+function getVenuePlaylist (ctrl, venue, e) {
+  e.preventDefault();
+  m.request({
+    url: '/venues/' + venue.id,
+    method: 'GET'
+  }).then(vm.artist_profiles)
+}
+
+
+// search & search result stuff
+
+function ctrl () {
+  var ctrl = {
+    venues: m.prop([])
+  }
+  return ctrl
+}
+
+var venueSearchResult = function (ctrl, v) {
+  return [
+    m('.venue_search_result', [
+      m('div', [
+        m('a', {
+          onclick: getVenuePlaylist.bind(null, ctrl, v),
+          href: '#'
+        }, v.name)
+      ]),
+      m('a', {href: v.website}, 'Venue website'),
+      m('br'),
+      v.address
+    ]),
+    m('br')
+  ]
+}
+
+function venueSearchView (ctrl) {
+  var results = ctrl.venues().map(venueSearchResult.bind(null, ctrl));
+
+  return [
+    m('form', { onsubmit: searchForVenue.bind(null, ctrl) },  [  // revisit 12/17
+      m('input[name=venue]')
+    ]),
+    m('br'),
+    results
+  ]
+}
+
+function searchForVenue (ctrl, e) {
+  e.preventDefault();
+  m.request({
+    url: '/venues/search',
+    method: 'POST',
+    data: { venue: e.currentTarget.venue.value }
+  }).then(ctrl.venues)
+}
+
+m.module(document.getElementById('venue_search'), { controller: ctrl, view: venueSearchView })
+m.module(document.getElementById('venue_playlist'), { controller: ctrl, view: venuePlaylistView })
+
+</script>

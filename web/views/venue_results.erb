@@ -1,0 +1,10 @@
+Results<br />
+<ol>
+<% @results.each do |r| %>
+  <li>
+    <a href='/venues/<%= r[:id] %>'><%= r[:name] %></a>
+    <%= r[:address] %>
+    <%= r[:website] %>
+  </li>
+<% end %>
+</ol>

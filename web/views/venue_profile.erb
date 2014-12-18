@@ -1,0 +1,8 @@
+<% @top_songs_by_artist.each do |x| %>
+  <h3><%= x[:name] %></h3>
+  <% x[:songs].each do |s| %>
+    <ul>
+      <li><a href='<%= s[:url] %>'><%= s[:name] %></a></li>
+    </ul>
+  <% end %>
+<% end %>
