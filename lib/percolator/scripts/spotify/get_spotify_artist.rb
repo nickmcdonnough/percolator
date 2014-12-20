@@ -3,20 +3,22 @@ module Percolator
     def run artist_name
       url = build_url artist_name
       response = Unirest.get URI.encode(url)
-      results = response.body['artists']['items']
+      results = response.body['artists']['items'] unless response.body.empty?
 
-      if results.size.zero?
-        failure :artist_not_found
-      else
-        success narrow_down(artist_name, results)
-      end
+      return failure :artist_not_found if results.nil?
+
+      artist = narrow_down(artist_name, results) unless results.empty?
+
+      return failure :artist_not_found if artist.nil?
+
+      success(data: artist)
     end
 
     def narrow_down artist_name, results
       return results.first if artist_name == results.first['name']
 
       results.find do |c|
-        diff = Percolator::Hamming.run [artist_name, c['name']]
+        diff = Percolator::Hamming.run artist_name, c['name']
         diff <= 3
       end
     end
