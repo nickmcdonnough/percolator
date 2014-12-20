@@ -40,17 +40,14 @@ class Percolator::Server < Sinatra::Application
 
   get '/venues/:songkick_id' do
     headers['Content-Type'] = 'application/json'
-
     artist_names = Percolator::GetVenueArtists.run params
-
     artists = artist_names.data.first(10).map do |artist|
       Percolator::GetSpotifyArtist.run artist
     end
-
     top_songs_by_artist = artists.select { |x| x.success? }.map do |artist|
       {
-        name: artist['name'],
-        tracks: Percolator::GetArtistTopSongs.run(artist['id'])
+        name: artist.data['name'],
+        tracks: Percolator::GetArtistTopSongs.run(artist.data['id'])
       }
     end.delete_if { |x| x[:tracks].empty? }
     top_songs_by_artist.to_json
