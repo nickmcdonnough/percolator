@@ -1,7 +1,7 @@
 module Percolator
   class Hamming < TXS
-    def run a, b
-      x, y = a.downcase, b.downcase
+    def run pair
+      x, y = pair.first.downcase, pair.last.downcase
       counter, diff = 0, 0
       length = [x.size, y.size].min
 

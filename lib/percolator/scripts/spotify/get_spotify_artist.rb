@@ -18,7 +18,7 @@ module Percolator
       return results.first if artist_name == results.first['name']
 
       results.find do |c|
-        diff = Percolator::Hamming.run artist_name, c['name']
+        diff = Percolator::Hamming.run [artist_name, c['name']]
         diff <= 3
       end
     end
