@@ -14,7 +14,7 @@ module Percolator
 
       artists = events.map do |r|
         r['performance'].map { |a| a['displayName'] }
-      end.flatten
+      end.flatten.uniq
 
       success(data: artists)
     end
