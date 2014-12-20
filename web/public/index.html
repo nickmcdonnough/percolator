@@ -1,11 +1,13 @@
 <!doctype html>
 <title>Title</title>
+<link rel='stylesheet' href='styles/percolator.css'>
 <link rel='stylesheet' href='styles/skeleton/skeleton.css'>
 <link rel='stylesheet' href='styles/skeleton/normalize.css'>
 <script src='/js/vendor/mithril.js'></script>
 
-<div id='venue_search'></div>
-<div id='venue_playlist'></div>
+
+<div id='venue-search'></div>
+<div id='venue-playlist'></div>
 
 <script>
 // console log function for logging results of ajax requests
@@ -13,6 +15,7 @@ var log = function (value) {
   console.log(value)
 }
 
+// view-model
 var vm = {
   view: m.prop('search'),
   venues: m.prop([]),
@@ -20,9 +23,13 @@ var vm = {
 }
 
 
-function VenueCtrl () {
+// venue stuff
+
+Venue = {}
+
+Venue.controller = function () {
   var ctrl = {
-    searchForVenue: function searchForVenue (e) {
+    searchForVenue: function (e) {
       e.preventDefault();
       m.request({
         url: '/venues/search',
@@ -43,7 +50,7 @@ function VenueCtrl () {
 
 var venueSearchResult = function (ctrl, v) {
   return [
-    m('.venue_search_result', [
+    m('.venue-search-result', [
       m('div', [
         m('a', {
           onclick: ctrl.getVenuePlaylist.bind(null, v),
@@ -58,21 +65,22 @@ var venueSearchResult = function (ctrl, v) {
   ]
 }
 
-function venueSearchView (ctrl) {
+Venue.view = function (ctrl) {
   if (vm.view() !== 'search') return null
 
   var results = vm.venues().map(venueSearchResult.bind(null, ctrl));
 
   return [
-    m('form', { onsubmit: ctrl.searchForVenue },  [  // revisit 12/17
-      m('input[name=venue]')
+    m('div', {class: 'venue-search-form'}, [
+      m('form', { onsubmit: ctrl.searchForVenue },  [  // revisit 12/17
+        m('input[name=venue]')
+      ])
     ]),
-    m('br'),
     results
   ]
 }
 
-/////
+///// Playlist stuff
 Playlist = {}
 Playlist.controller = function () {}
 
@@ -90,7 +98,7 @@ var playlistItem = function (artist_profile) {
   var tracks = artist_profile.tracks.map(artistTrack);
 
   return [
-    m('.playlist_item', [
+    m('.playlist-item', [
       artist_profile.name,
       m('br'),
       tracks,
@@ -107,7 +115,6 @@ Playlist.view = function (ctrl) {
 // <--
 
 
-m.module(document.getElementById('venue_search'), { controller: VenueCtrl, view: venueSearchView })
-m.module(document.getElementById('venue_playlist'), Playlist)
-
+m.module(document.getElementById('venue-search'), Venue)
+m.module(document.getElementById('venue-playlist'), Playlist)
 </script>
