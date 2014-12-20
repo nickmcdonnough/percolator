@@ -6,11 +6,11 @@ module Percolator
 
       response = Unirest.get URI.encode(url)
 
-      unless response.code == 200
-        return failure :artist_search_failure
-      end
+      return failure :artist_search_failure unless response.code == 200
 
       events  = response.body['resultsPage']['results']['event']
+
+      return failure :no_upcoming_shows if events.nil?
 
       artists = events.map do |r|
         r['performance'].map { |a| a['displayName'] }

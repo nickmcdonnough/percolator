@@ -108,9 +108,13 @@ var playlistItem = function (artist_profile) {
 }
 
 Playlist.view = function (ctrl) {
-  var profiles = vm.artist_profiles().map(playlistItem);
+  if (vm.artist_profiles().success) {
+    var html = vm.artist_profiles().map(playlistItem);
+  } else {
+    var html = m('.playlist-item', vm.artist_profiles().error)
+  }
 
-  return profiles
+  return html
 }
 // <--
 
