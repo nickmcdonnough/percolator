@@ -3,134 +3,34 @@
 <link rel='stylesheet' href='styles/percolator.css'>
 <link rel='stylesheet' href='styles/skeleton/skeleton.css'>
 <link rel='stylesheet' href='styles/skeleton/normalize.css'>
+<script src='/js/ext/functions.js'></script>
 <script src='/js/vendor/mithril.js'></script>
+<script src='/js/venues.js'></script>
+<script src='/js/playlist.js'></script>
 
-
-<div id='venue-search'></div>
-<div id='venue-playlist'></div>
+<div class='container'>
+  <div class='row' id='header'>
+    <h4><a href='/'>Percolator</a></h4>
+    Discover music by venue
+  </div>
+  <div class='row'>
+    <div class='one-half column'>
+      <div id='venue-search'></div>
+    </div>
+    <div class='one-half column'>
+      <div id='venue-playlist'></div>
+    </div>
+  </div>
+</div>
 
 <script>
-// console log function for logging results of ajax requests
-var log = function (value) {
-  console.log(value);
-  return value
-}
-
-// view-model
-var vm = {
-  view: m.prop('search'),
-  venues: m.prop([]),
-  artist_profiles: m.prop([])
-}
-
-
-// venue stuff
-
-Venue = {}
-
-Venue.controller = function () {
-  var ctrl = {
-    searchForVenue: function (e) {
-      e.preventDefault();
-      m.request({
-        url: '/venues/search',
-        method: 'POST',
-        data: { venue: e.currentTarget.venue.value }
-      }).then(vm.venues)
-    },
-    getVenueArtists: function (venue, e) {
-      e.preventDefault();
-      m.request({
-        url: '/venues/' + venue.id,
-        method: 'GET'
-      }).then(getArtistProfiles).then(vm.view.bind(null, 'playlist'))
-    }
+(function () {
+  var log = function (value) {
+    console.log(value);
+    return value
   }
-  return ctrl
-}
 
-function getArtistProfiles (artistNames) {
-  var artistIDs = [];
-  artistNames.forEach(function (name) {
-    var artistSearchUrl = 'https://api.spotify.com/v1/search?q=' + name + '&type=artist';
-    m.request({url: artistSearchUrl, method: 'GET'}).then(function (artistResults) {
-      var artistID = artistResults.artists.items[0].id;
-      var artistTopTracksUrl = 'https://api.spotify.com/v1/artists/' + artistID + '/top-tracks?country=US'
-      m.request({url: artistTopTracksUrl, method: 'GET'}).then(function (trackResults) {
-        var topThree = trackResults.tracks.slice(0, 3);
-        var profile = {name: name, tracks: topThree};
-        vm.artist_profiles().push(profile)
-      })
-    })
-  })
-}
-
-var venueSearchResult = function (ctrl, v) {
-  return [
-    m('.venue-search-result', [
-      m('div', [
-        m('a', {
-          onclick: ctrl.getVenueArtists.bind(null, v),
-          href: '#'
-        }, v.name)
-      ]),
-      m('a', {href: v.website}, 'Venue website'),
-      m('br'),
-      v.address
-    ]),
-    m('br')
-  ]
-}
-
-Venue.view = function (ctrl) {
-  if (vm.view() !== 'search') return null
-
-  var results = vm.venues().map(venueSearchResult.bind(null, ctrl));
-
-  return [
-    m('div', {class: 'venue-search-form'}, [
-      m('form', { onsubmit: ctrl.searchForVenue },  [  // revisit 12/17
-        m('input[name=venue]')
-      ])
-    ]),
-    results
-  ]
-}
-
-///// Playlist stuff
-Playlist = {}
-Playlist.controller = function () {}
-
-var artistTrack = function (track) {
-  return [
-    m('a', {
-      href: track.external_urls.spotify,
-      target: '_blank'
-    }, track.name),
-    m('br')
-  ]
-}
-
-var playlistItem = function (artistProfile) {
-  var tracks = artistProfile.tracks.map(artistTrack);
-
-  return [
-    m('.playlist-item', [
-      artistProfile.name,
-      m('br'),
-      tracks,
-      m('br')
-    ])
-  ]
-}
-
-Playlist.view = function (ctrl) {
-  var html = vm.artist_profiles().map(playlistItem);
-  return m('.playlist', html)
-}
-// <--
-
-
-m.module(document.getElementById('venue-search'), Venue)
-m.module(document.getElementById('venue-playlist'), Playlist)
+  m.module(document.getElementById('venue-search'), Venue)
+  m.module(document.getElementById('venue-playlist'), Playlist)
+})()
 </script>

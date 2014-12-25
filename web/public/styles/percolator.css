@@ -1,3 +1,20 @@
-#venue-search, #venue-playlist {
-  text-align: center;
+#header a, #playlist a {
+  text-decoration: none;
 }
+
+#venue-playlist { text-align: center;}
+
+#venue-playlist {
+  background-color: #dbeede;
+}
+
+.venue-selection {
+  background-color: #dbeede;
+}
+
+a div.venue-search-result {
+  text-decoration: none;
+}
+/*#header, #venue-search, #venue-playlist {
+  text-align: center;
+}*/

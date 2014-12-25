@@ -45,7 +45,6 @@ class Percolator::Server < Sinatra::Application
     unless artist_names.success?
       halt 200, {success: false, error: 'No upcoming shows.'}.to_json
     end
-
     artist_names.data.to_json
   end
 
