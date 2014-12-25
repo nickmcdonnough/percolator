@@ -12,7 +12,8 @@
 <script>
 // console log function for logging results of ajax requests
 var log = function (value) {
-  console.log(value)
+  console.log(value);
+  return value
 }
 
 // view-model
@@ -37,23 +38,70 @@ Venue.controller = function () {
         data: { venue: e.currentTarget.venue.value }
       }).then(vm.venues)
     },
-    getVenuePlaylist: function (venue, e) {
+    getVenueArtists: function (venue, e) {
       e.preventDefault();
       m.request({
         url: '/venues/' + venue.id,
         method: 'GET'
-      }).then(vm.artist_profiles).then(vm.view.bind(null, 'playlist'))
+      }).then(getArtistProfiles).then(vm.view.bind(null, 'playlist'))
     }
   }
   return ctrl
 }
+
+function getArtistProfiles (artistNames) {
+  var artistIDs = [];
+  artistNames.forEach(function (name) {
+    var artistSearchUrl = 'https://api.spotify.com/v1/search?q=' + name + '&type=artist';
+    m.request({url: artistSearchUrl, method: 'GET'}).then(function (artistResults) {
+      var artistID = artistResults.artists.items[0].id;
+      var artistTopTracksUrl = 'https://api.spotify.com/v1/artists/' + artistID + '/top-tracks?country=US'
+      m.request({url: artistTopTracksUrl, method: 'GET'}).then(function (trackResults) {
+        var topThree = trackResults.tracks.slice(0, 3);
+        var profile = {name: name, tracks: topThree};
+        vm.artist_profiles().push(profile)
+      })
+    })
+  })
+}
+
+// function getSpotifyArtist (artistName) {
+//   var url = 'https://api.spotify.com/v1/search?q=' + artistName + '&type=artist';
+//   var request = m.deferred();
+//   m.request({method: 'GET', url: url}).then(request.deferred)
+//   return request.promise
+// }
+//
+//
+//
+// function buildArtistProfiles (artistNames) {
+//   var promises = artistNames.map(function (name) {
+//     getSpotifyArtist(name);
+//   })
+//   debugger
+//   m.sync(promises).then(function (searchResults) {
+//     searchResults.map(function (sr) {
+//       vm.artist_profiles().push(sr.artists.items[0]);
+//       return true
+//     })
+//   })
+//   return true
+// }
+
+
+
+
+
+
+
+
 
 var venueSearchResult = function (ctrl, v) {
   return [
     m('.venue-search-result', [
       m('div', [
         m('a', {
-          onclick: ctrl.getVenuePlaylist.bind(null, v),
+          onclick: ctrl.getVenueArtists.bind(null, v),
           href: '#'
         }, v.name)
       ]),
@@ -87,19 +135,19 @@ Playlist.controller = function () {}
 var artistTrack = function (track) {
   return [
     m('a', {
-      href: track.url,
+      href: track.external_urls.spotify,
       target: '_blank'
     }, track.name),
     m('br')
   ]
 }
 
-var playlistItem = function (artist_profile) {
-  var tracks = artist_profile.tracks.map(artistTrack);
+var playlistItem = function (artistProfile) {
+  var tracks = artistProfile.tracks.map(artistTrack);
 
   return [
     m('.playlist-item', [
-      artist_profile.name,
+      artistProfile.name,
       m('br'),
       tracks,
       m('br')
@@ -108,13 +156,8 @@ var playlistItem = function (artist_profile) {
 }
 
 Playlist.view = function (ctrl) {
-  if (vm.artist_profiles().success) {
-    var html = vm.artist_profiles().map(playlistItem);
-  } else {
-    var html = m('.playlist-item', vm.artist_profiles().error)
-  }
-
-  return html
+  var html = vm.artist_profiles().map(playlistItem);
+  return m('.playlist', html)
 }
 // <--
 

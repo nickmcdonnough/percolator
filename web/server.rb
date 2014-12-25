@@ -46,18 +46,19 @@ class Percolator::Server < Sinatra::Application
       halt 200, {success: false, error: 'No upcoming shows.'}.to_json
     end
 
-    artists = artist_names.data.first(10).map do |artist|
-      Percolator::GetSpotifyArtist.run artist
-    end
+    artist_names.data.to_json
+    # artists = artist_names.data.first(10).map do |artist|
+    #   Percolator::GetSpotifyArtist.run artist
+    # end
 
-    top_songs_by_artist = artists.select { |x| x.success? }.map do |artist|
-      {
-        name: artist.data['name'],
-        tracks: Percolator::GetArtistTopSongs.run(artist.data['id'])
-      }
-    end.delete_if { |x| x[:tracks].empty? }
+    # top_songs_by_artist = artists.select { |x| x.success? }.map do |artist|
+    #   {
+    #     name: artist.data['name'],
+    #     tracks: Percolator::GetArtistTopSongs.run(artist.data['id'])
+    #   }
+    # end.delete_if { |x| x[:tracks].empty? }
 
-    top_songs_by_artist.to_json
+    # top_songs_by_artist.to_json
   end
 
   # send found songs to spotify
