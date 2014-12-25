@@ -65,37 +65,6 @@ function getArtistProfiles (artistNames) {
   })
 }
 
-// function getSpotifyArtist (artistName) {
-//   var url = 'https://api.spotify.com/v1/search?q=' + artistName + '&type=artist';
-//   var request = m.deferred();
-//   m.request({method: 'GET', url: url}).then(request.deferred)
-//   return request.promise
-// }
-//
-//
-//
-// function buildArtistProfiles (artistNames) {
-//   var promises = artistNames.map(function (name) {
-//     getSpotifyArtist(name);
-//   })
-//   debugger
-//   m.sync(promises).then(function (searchResults) {
-//     searchResults.map(function (sr) {
-//       vm.artist_profiles().push(sr.artists.items[0]);
-//       return true
-//     })
-//   })
-//   return true
-// }
-
-
-
-
-
-
-
-
-
 var venueSearchResult = function (ctrl, v) {
   return [
     m('.venue-search-result', [
