@@ -7,4 +7,5 @@ A web app tying together a variety of APIs to help you find music. Originally st
 So many things...
 * support for searching by geographic location
 * support for exporting playlists to Spotify
+* lots of styling needed
 * many, many more
