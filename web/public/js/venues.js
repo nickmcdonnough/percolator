@@ -1,10 +1,4 @@
 (function () {
-  // view-model
-  window.vm = {
-    view: m.prop('search'),
-    venues: m.prop([]),
-    artistProfiles: m.prop([])
-  }
 
   Venue = {}
 
@@ -35,6 +29,8 @@
 
   function clearSelectedResults () {
     var results = document.getElementsByClassName('venue-search-result');
+    var playlistDiv = document.getElementById('playlist');
+    playlistDiv.style.height = '400px';
     for (var i = 0; i < results.length; i++) {
       results[i].className = 'venue-search-result'
     }
@@ -65,15 +61,15 @@
   function fetchTracks (artist) {
     if (artist.id === undefined) { return [] }
 
-    var artistTopTracksUrl = 'https://api.spotify.com/v1/artists/' + artist.id + '/top-tracks?country=US'
+    var artistTopTracksUrl = 'https://api.spotify.com/v1/artists/' + artist.id + '/top-tracks?country=US';
     return m.request({url: artistTopTracksUrl, method: 'GET'}).then(function(trackResults) {
       return trackResults.tracks
     })
   }
 
   function buildProfile (name, tracks) {
-    var topThree = tracks.slice(0, 3)
-    return { name: name, tracks: topThree }
+    var topThree = tracks.slice(0, 3);
+    return {name: name, tracks: topThree}
   }
 
   var venueSearchResult = function (ctrl, v) {
@@ -83,27 +79,32 @@
         href: '#'
       }, m('.venue-search-result', [
         v.name,
-        ' (', m('a', {href: v.website}, 'website'), ')',
         m('br'),
-        v.address
+        v.address,
+        m('br'),
+        v.website ? v.website.replace(/http:|\//ig,'') : null
       ])),
       m('br')
     ]
   }
 
-  Venue.view = function (ctrl) {
-    //if (vm.view() !== 'search') return null
-
-    var results = vm.venues().map(venueSearchResult.bind(null, ctrl));
-
+  var venueSearchForm = function (ctrl) {
     return [
-      m('div', {class: 'venue-search-form'}, [
+      m('.col-md-4', {class: 'venue-search-form'}, [
         m('form', { onsubmit: ctrl.searchForVenue },  [  // revisit 12/17
-          m('input[name=venue]')
+          m('input[name=venue]', {type: 'text', class: 'form-control'})
         ])
-      ]),
+      ])
+    ]
+  }
+
+  Venue.view = function (ctrl) {
+    var form = venueSearchForm(ctrl);
+    var results = vm.venues().map(venueSearchResult.bind(null, ctrl));
+    var resultDiv = m('.col-md-3', [
       results[0] ? m('h5', 'Search results:') : null,
       results
-    ]
+    ])
+    return [form, resultDiv]
   }
 })()

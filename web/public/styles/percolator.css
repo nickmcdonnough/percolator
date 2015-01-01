@@ -1,20 +1,52 @@
-#header a, #playlist a {
+a {
   text-decoration: none;
 }
 
-#venue-playlist { text-align: center;}
+#header { text-align: center; }
 
 #venue-playlist {
+  text-align: center;
   background-color: #dbeede;
+  overflow-y: scroll;
 }
 
 .venue-selection {
   background-color: #dbeede;
 }
 
-a div.venue-search-result {
-  text-decoration: none;
+#footer {
+  margin-top:10px;
+  width: 100%;
+  height: 18px;
+  font-size:12px;
 }
-/*#header, #venue-search, #venue-playlist {
+
+#footer a {
+    color:#555555;
+}
+
+#venue-search { text-align: center; }
+#venue-playlist { text-align: center; }
+
+input[name='search-query'] {
+  width: 50%;
+  margin: 0 auto;
   text-align: center;
-}*/
+}
+
+input[name='venue'] {
+  width: 50%;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.artist-picture {
+  border-radius: 9999px;
+  overflow: hidden;
+  width: 48px;
+  height: 48px;
+  img {
+    width: 100%;
+    height: 100%
+  }
+}
